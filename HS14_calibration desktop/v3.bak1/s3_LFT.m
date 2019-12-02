@@ -1,0 +1,93 @@
+%% THis scrip uses the reconstructinos and reconstructs the Liquif Film thickness
+
+%% s3_centering 
+
+if  any(itr_stp==8) % execute this script?
+    i=8; % specifies step index of this file, is two
+    t1=toc;
+ 
+    [~,name,~]=fileparts(mfilename('fullpath')); %get m file name
+    disp(['deploying ',name,'...']) %command line output    
+       
+    % loard recons
+    block_old=strcat(nam_block,nam_stp{i-1},'_',pfx_cas{3});
+    path_block=strcat(dir_work,block_old);
+    block=f3_loadSingleVariableMATFile(path_block);
+    %%
+    
+    dr=5;                   % deviation around the radius in pixel
+    r_min=round(r_rod*res-0.5*dr);  %physical radius in pixel, with tolerance
+    r_min=112;               % empirical check shows
+    S=0.99;                  %sensitivity threshold
+    o =40;                  % overlap
+    da=-90;  % width of angle range in deg
+    n_path=round((90/360)*2*pi*5.14*res);  % number of sample paths per pin 
+    r_path=round(6.7*res); % path length in pixel, res=22.1
+    
+    
+    %preallocacte
+    c=zeros(imrange(2,2),4,2);  % center [x,y] coordinates of circles
+    rad=zeros(imrange(2,2),4);  % radius values of the circles
+    m=zeros(imrange(2,2),4);    % confidencey of this circle fit
+    a0=zeros(imrange(2,2),4); % first angle for each circle
+    a00=zeros(1,4);             % parfor-slicing helper a0
+    p_end=zeros(imrange(2,2),4);
+    
+    for l=1:24 % "sliced" parfor
+        a=(l-1)*100+1;
+        b=l*100;
+        disp([l,a,b])
+        for k=a:b  %pafor
+            disp(k)
+            %slice data
+            im=squeeze(block(:,:,k));
+            imbw1=f_normalize(im);
+
+            %create black/white-image (helps the algorhythm)
+            imbw=im2bw(imbw1,0.6); %empirically chosen threshold of 0.6 for greylevel to bw coonversion
+
+            % find centers & radii
+            try
+                [c(k,:,:),rad(k,:),m(k,:)]=f_hugh_4(imbw,r_min,dr,S,o,0.6); %have this file in the same folder
+                if ~all(rad(k,:))
+                    fprintf ('%4d zero! detected',k)
+                end
+            
+            catch
+                fprintf('%4d had a problem assigning the circle values\n',k)
+            end
+            
+            % get the paths
+            for l=1:4
+        
+                ll=mod(l,4)+1;  % periodic index of next pin 
+                % the starting angle a0 is the direction from one center to the next one
+                % atan2( y_c2- y_c1, x_c2 - x_c1)
+                a00(l)=radtodeg(...
+                    atan2(c(k,ll,2)-c(k,l,2),...
+                          c(k,ll,1)-c(k,l,1)));
+                      
+
+                % generate the path endpoints
+                [G.p(i).pin(j).endpts.x,G.p(i).pin(j).endpts.y] = f_LinGen(...
+                [G.p(i).pin(j).cntx,G.p(i).pin(j).cnty],...
+                G.p(i).pin(j).a0, G.da, G.n_path, G.r_path);
+
+        
+            end
+            a0(l,:)=a00;
+            
+
+
+        end
+        
+
+    end
+
+    % debug: plot
+%     figure(1);
+%     imagesc(cl33');colormap(gray);axis equal; axis tight;set(gca,'YDir','normal');
+%     hold on
+%     scatter(c2(:,1),c2(:,2),'gx') %centers
+%     viscircles(c2, rad,'EdgeColor','g','LineStyle',':','LineWidth',1,'EnhanceVisibility',0);
+%     axis([0 749 0 749]); axis equal

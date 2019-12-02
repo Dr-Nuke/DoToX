@@ -1,0 +1,76 @@
+Dear all,
+since my last Matlab project I encounter some very untypical issues. I have literally no clue about them. apart from that my 
+General Situation: I am developing with the Matlab Editor, R2014a and R2014b on 3 different computers and every one of them shows these issues. These issues seem to appear randomly, on average maybe one in 10 times I run a script. They are semi-reproducable. For their strangeness, random appearence and random "workarounds" I consider uploading a screen capure video in case the readers cannot help me here. I appreciate any help, thank you!
+
+I) the last few (typically 4) characters of my current script get "lost", often the end statement of some loop. This of course throws an error. I thought i unintentionally deleted these characters, but ctrl+z wont bring the missing characters back. Up to now I manually rewrite those letters. [code examples yet to be added here]
+
+
+II) Random not- executing and / or throwing errors. Adding random empty lines and semicolons to the scripts seem so resolve this one.
+The following script "colorterst.m" I wrote and the first execution would return the missing END error:
+
+  
+  figure()
+  hold on
+  for i=1:10
+      plot([1,2],[3+i/10,4])
+      for j=1:5
+          disp(j)
+      end
+  end
+  ; 
+   
+on the second stroke of F5 the script runs as intended. Then, after removing the tailing semicolon and running it
+
+  
+  figure()
+  hold on
+  for i=1:10
+      plot([1,2],[3+i/10,4])
+      for j=1:5
+          disp(j)
+      end
+  end
+  
+it would neither execute nor throw an error, but only give me
+
+  >> colorterst
+  >> colorterst
+  >> colorterst
+  >> colorterst
+  >> colorterst
+  >> colorterst
+  >> colorterst
+
+(note: none of the disp(j) is printed!). Adding the semicolon to the disp command lets the script run again.
+
+  figure()
+  hold on
+  for i=1:10
+      plot([1,2],[3+i/10,4])
+      for j=1:5
+          disp(j);
+      end
+  end
+ 
+somewhat later, executing
+
+  figure()
+  hold on
+  a=hsv;
+  for i=1:100
+      ind_col=ceil(size(a,1)*i/100);
+      plot([1,2],[3+i/10,4],'color',a(ind_col,:))
+      for j=1:5
+         pause(0)
+      end
+       fprintf('%d ',i)
+  end
+   
+  ;
+
+returns, after changing the two 10's to 100's,
+
+  Error: File: colorterst.m Line: 4 Column: 1
+  At least one END is missing: the statement may begin here.
+
+after pasting the code and command line output, i return to the editor and press F5 for the second time and the exact same code properly executes.

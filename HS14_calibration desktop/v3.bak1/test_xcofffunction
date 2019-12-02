@@ -1,0 +1,4 @@
+% test for the new function to encapsulate the xcov subgrid  shift
+
+for i=1:376
+    [a(i),b(i)]=f3_subpixcorr(tiltblock(:,600,i),tiltblock(:,2000,i));

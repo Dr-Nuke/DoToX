@@ -1,0 +1,36 @@
+function M = f4_CropFrames(M)
+% crops the data frames accordingly
+
+
+if M.proofs
+    figure(1);clf;
+    %set(gcf,'units','normalized','outerposition',[0 0 1 1])
+    a=squeeze(M.raw(:,50,:));
+    imshow(a,[]);set(gca,'YDir','normal')
+    title('Raw sinogram of the angle gauge region')
+    saveas(gcf,'Fig01 raw sinogram.pdf')
+
+    figure(2);clf;
+    ii=[-1,0,1];
+    for i=1:3
+
+        b=a(:,M.d.crop(1):M.d.crop(2)+ii(i));
+        subplot(3,1,i)
+        imshow(circshift(b,100,2),[]);set(gca,'YDir','normal')
+        axis(M.d.axlim)  
+
+        axis on
+        title(sprintf('crop adjustment: %d frames',ii(i)))
+    end
+
+        figure(3);clf;
+        imshow(circshift(b,100,2),[]);set(gca,'YDir','normal')
+        saveas(gcf,'Fig02 frame number adjustment.pdf')
+end
+
+M.im=M.raw(:,:,M.d.crop(1):M.d.crop(2));
+M.nFrame=size(M.im,3);
+M=rmfield(M,'raw');
+
+end
+

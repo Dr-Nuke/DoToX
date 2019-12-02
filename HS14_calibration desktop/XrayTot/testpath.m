@@ -1,0 +1,1 @@
+[a,b,c]=fileparts(mfilename('fullpath')); %get m file name

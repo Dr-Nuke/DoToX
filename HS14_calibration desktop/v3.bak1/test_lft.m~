@@ -1,0 +1,96 @@
+%script to find the thickness of the liquid film (bright areas) on the 
+% coolant rods (dark/ not seen)
+
+
+% file names and paths
+
+
+cl33=squeeze(block(:,:,600));
+cl33=f_normalize(cl33);
+
+%create black/white-image (helps the algorhythm)
+clbw=im2bw(cl33,0.6); %empirically chosen threshold of 0.6 for greylevel to bw coonversion
+%clbw=imcomplement(clbw); %invert the bw image
+
+res=22.1;       % pixel/mm, camera characteristic
+r_rod=5.14;     % physical radius of the coolant rods
+dr=3;           % deviation around the radius in pixel
+r_min=round(r_rod*res-0.5*dr); %5.14 mm physical radius of the coolant rods
+r_min=112;      % empirical test shows the above calculation underestimates
+S=0.99;         % Sensitivity threshold
+o =40;          % overlap
+
+
+%% find centers & radii
+[c,rad,m]=f_hugh_4(clbw,r_min,dr,S,o,0.6); %have this file in the same folder
+c2=fliplr(c);
+disp([c2,rad,m])
+
+%% plot result
+figure(1);
+imagesc(cl33');colormap(gray);axis equal; axis tight;set(gca,'YDir','normal');
+hold on
+scatter(c2(:,1),c2(:,2),'gx') %centers
+viscircles(c2, rad,'EdgeColor','g','LineStyle',':','LineWidth',1,'EnhanceVisibility',0);
+axis([0 749 0 749]); axis equal
+
+%% add my manual fit, this is what i want to get from the circle detection
+
+% x_m=[236;301;592;527];  % center x
+% y_m=[299;588;525;233];  % center y
+% r_m=[113;113;114;114];  % inner radius
+% c_m= [x_m,y_m];
+% scatter(c_m(:,1),c_m(:,2),'rx')
+% viscircles(c_m, r_m,'LineStyle',':','LineWidth',1,'EnhanceVisibility',0);
+% legend({'circle finder',['desired findings' char(10) '(manually entered)']})
+
+;
+
+
+%% find angles
+figure(5)
+clf
+hold on
+da=90;
+n=100;
+r2=150;
+
+for i=1:4,
+    j=mod(i,4)+1;
+    disp([i,j]);
+    a_start=radtodeg(atan2(c2(j,2)-c2(i,2),c2(j,1)-c2(i,1)));
+    [px,py] = f_LinGen(c2(i,:), a_start,da,n,r2);
+    for k=1:n,
+        plot([c2(i,1),px(k)],[c2(i,2),py(k)])
+    end
+end
+%axis([0 749 0 749]); axis equal
+
+
+
+%% do the line profiles
+;
+ imbo3(cl33,2)
+ hold on
+ [cx,cy,v,xi,yi] = improfile(cl33',[c2(4,1),points(1,1)'],[c2(4,2),points(1,2)'],1000);
+
+;
+
+
+;
+
+
+%%
+figure(34)
+clf
+imshow(im,[])
+hold on
+scatter(c_m(:,1),c_m(:,2),'rx')
+
+
+
+
+
+
+
+

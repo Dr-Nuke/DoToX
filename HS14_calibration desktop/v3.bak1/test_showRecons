@@ -1,0 +1,4 @@
+figure()
+
+for i=1:2450
+imshow(squeeze(recontot(:,:,i)),[]);axis equal; axis tight;set(gca,'YDir','normal'); 

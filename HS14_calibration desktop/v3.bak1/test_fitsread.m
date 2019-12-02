@@ -1,0 +1,1 @@
+a=fitsread('C:\data\Tomo_HS14\processed\1raw\d2o\d2o_0001_.fits');
