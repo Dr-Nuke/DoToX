@@ -7,4 +7,4 @@ one intermediate step was done by Prof. Prasser and is not cointained in this re
 
 Some libs like the Astra Toolbx & cuda libs are not contained in this repo.
 
-The main script is \HS14_calibration desktop\v3\total_v3.m
+The main script is \HS14_calibration desktop\final_campaign\total_final.m
